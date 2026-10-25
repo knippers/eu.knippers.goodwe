@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Firmware version",
+    "nl": "Firmwareversie"
+  },
+  "uiGroup": "misc",
+  "getable": true,
+  "setable": false,
+  "insights": false
+}

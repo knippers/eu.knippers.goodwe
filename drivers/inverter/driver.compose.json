@@ -1,0 +1,75 @@
+{
+  "name": {
+    "en": "Inverter",
+    "nl": "Omvormer"
+  },
+  "class": "solarpanel",
+  "capabilities": [
+    "measure_power",
+    "goodwe_pv1_power",
+    "goodwe_pv2_power",
+    "measure_voltage",
+    "measure_temperature",
+    "goodwe_status",
+    "goodwe_firmware"
+  ],
+  "capabilitiesOptions": {
+    "measure_power": {
+      "title": {
+        "en": "Current power",
+        "nl": "Huidig vermogen"
+      }
+    },
+    "measure_voltage": {
+      "title": {
+        "en": "Grid voltage",
+        "nl": "Netspanning"
+      }
+    }
+  },
+  "ui": {
+    "groups": {
+      "power": {
+        "en": "Power",
+        "nl": "Vermogen"
+      },
+      "misc": {
+        "en": "Miscellaneous",
+        "nl": "Overig"
+      }
+    }
+  },
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "lan"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "pair",
+      "navigation": {
+        "next": "list_devices"
+      }
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      },
+      "options": {
+        "singular": true
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

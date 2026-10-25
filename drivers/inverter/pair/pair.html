@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <fieldset class="homey-form-fieldset" style="margin-top: 0">
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="ip_address">IP address</label>
+        <input
+          class="homey-form-input"
+          id="ip_address"
+          type="text"
+          placeholder="192.168.1.50"
+        />
+      </div>
+
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="port">TCP port</label>
+        <input class="homey-form-input" id="port" type="number" value="502" />
+      </div>
+
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="modbus_id">Modbus ID</label>
+        <input class="homey-form-input" id="modbus_id" type="number" value="1" />
+      </div>
+
+      <div>
+        <div class="flex-container">
+          <div class="item-left" id="result"></div>
+          <div class="item-right">
+            <button id="submit" class="homey-button-primary">
+              Check connection
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <script type="text/javascript">
+      const getVal = (id) => document.getElementById(id).value;
+      const setTxt = (id, txt) => (document.getElementById(id).innerHTML = txt);
+
+      Homey.setTitle("GoodWe");
+      Homey.setSubtitle("Connect your GoodWe inverter via Modbus TCP");
+
+      document.getElementById("submit").onclick = (e) => {
+        e.preventDefault();
+        setTxt("result", "");
+
+        const connection = {
+          ip_address: getVal("ip_address").trim(),
+          port: Number(getVal("port") || 502),
+          modbus_id: Number(getVal("modbus_id") || 1),
+        };
+
+        Homey.showLoadingOverlay();
+        Homey.emit("connect", connection, (err, result) => {
+          Homey.hideLoadingOverlay();
+          if (err) {
+            Homey.alert(err, "error", () => {});
+          } else {
+            setTxt("result", result);
+          }
+        });
+      };
+    </script>
+
+    <style>
+      .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .item-left {
+        color: green;
+        flex-grow: 1;
+      }
+
+      .item-right {
+        margin-left: 10px;
+      }
+    </style>
+  </body>
+</html>

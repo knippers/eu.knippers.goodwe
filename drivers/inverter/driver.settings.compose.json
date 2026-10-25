@@ -1,0 +1,38 @@
+[
+  {
+    "type": "group",
+    "label": {
+      "en": "Connection",
+      "nl": "Verbinding"
+    },
+    "children": [
+      {
+        "id": "ip_address",
+        "type": "text",
+        "label": {
+          "en": "IP address",
+          "nl": "IP-adres"
+        },
+        "value": ""
+      },
+      {
+        "id": "port",
+        "type": "number",
+        "label": {
+          "en": "TCP port",
+          "nl": "TCP-poort"
+        },
+        "value": 502
+      },
+      {
+        "id": "modbus_id",
+        "type": "number",
+        "label": {
+          "en": "Modbus ID",
+          "nl": "Modbus ID"
+        },
+        "value": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,218 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "eu.knippers.goodwe",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "GoodWe",
+    "nl": "GoodWe"
+  },
+  "description": {
+    "en": "Monitor your GoodWe solar inverter via Modbus TCP.",
+    "nl": "Monitor je GoodWe zonnomvormer via Modbus TCP."
+  },
+  "category": [
+    "energy"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Daniel Knippers",
+    "email": "daniel@knippers.eu"
+  },
+  "brandColor": "#E60012",
+  "tags": {
+    "en": [
+      "goodwe",
+      "solar",
+      "inverter",
+      "modbus",
+      "pv"
+    ],
+    "nl": [
+      "goodwe",
+      "zonne-energie",
+      "omvormer",
+      "modbus",
+      "pv"
+    ]
+  },
+  "source": "https://github.com/knippers/eu.knippers.goodwe",
+  "support": "https://github.com/knippers/eu.knippers.goodwe/issues",
+  "drivers": [
+    {
+      "name": {
+        "en": "Inverter",
+        "nl": "Omvormer"
+      },
+      "class": "solarpanel",
+      "capabilities": [
+        "measure_power",
+        "goodwe_pv1_power",
+        "goodwe_pv2_power",
+        "measure_voltage",
+        "measure_temperature",
+        "goodwe_status",
+        "goodwe_firmware"
+      ],
+      "capabilitiesOptions": {
+        "measure_power": {
+          "title": {
+            "en": "Current power",
+            "nl": "Huidig vermogen"
+          }
+        },
+        "measure_voltage": {
+          "title": {
+            "en": "Grid voltage",
+            "nl": "Netspanning"
+          }
+        }
+      },
+      "ui": {
+        "groups": {
+          "power": {
+            "en": "Power",
+            "nl": "Vermogen"
+          },
+          "misc": {
+            "en": "Miscellaneous",
+            "nl": "Overig"
+          }
+        }
+      },
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "images": {
+        "small": "/drivers/inverter/assets/images/small.png",
+        "large": "/drivers/inverter/assets/images/large.png",
+        "xlarge": "/drivers/inverter/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "pair",
+          "navigation": {
+            "next": "list_devices"
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": true
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "inverter",
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Connection",
+            "nl": "Verbinding"
+          },
+          "children": [
+            {
+              "id": "ip_address",
+              "type": "text",
+              "label": {
+                "en": "IP address",
+                "nl": "IP-adres"
+              },
+              "value": ""
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "TCP port",
+                "nl": "TCP-poort"
+              },
+              "value": 502
+            },
+            {
+              "id": "modbus_id",
+              "type": "number",
+              "label": {
+                "en": "Modbus ID",
+                "nl": "Modbus ID"
+              },
+              "value": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "goodwe_firmware": {
+      "type": "string",
+      "title": {
+        "en": "Firmware version",
+        "nl": "Firmwareversie"
+      },
+      "uiGroup": "misc",
+      "getable": true,
+      "setable": false,
+      "insights": false
+    },
+    "goodwe_pv1_power": {
+      "type": "number",
+      "title": {
+        "en": "PV string 1 power",
+        "nl": "PV string 1 vermogen"
+      },
+      "uiGroup": "power",
+      "getable": true,
+      "setable": false,
+      "units": {
+        "en": "W"
+      },
+      "insights": true
+    },
+    "goodwe_pv2_power": {
+      "type": "number",
+      "title": {
+        "en": "PV string 2 power",
+        "nl": "PV string 2 vermogen"
+      },
+      "uiGroup": "power",
+      "getable": true,
+      "setable": false,
+      "units": {
+        "en": "W"
+      },
+      "insights": true
+    },
+    "goodwe_status": {
+      "type": "string",
+      "title": {
+        "en": "Status",
+        "nl": "Status"
+      },
+      "uiGroup": "misc",
+      "getable": true,
+      "setable": false,
+      "insights": false
+    }
+  }
+}

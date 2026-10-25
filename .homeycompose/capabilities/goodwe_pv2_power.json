@@ -1,0 +1,14 @@
+{
+  "type": "number",
+  "title": {
+    "en": "PV string 2 power",
+    "nl": "PV string 2 vermogen"
+  },
+  "uiGroup": "power",
+  "getable": true,
+  "setable": false,
+  "units": {
+    "en": "W"
+  },
+  "insights": true
+}

@@ -1,0 +1,49 @@
+{
+  "id": "eu.knippers.goodwe",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "GoodWe",
+    "nl": "GoodWe"
+  },
+  "description": {
+    "en": "Monitor your GoodWe solar inverter via Modbus TCP.",
+    "nl": "Monitor je GoodWe zonnomvormer via Modbus TCP."
+  },
+  "category": [
+    "energy"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Daniel Knippers",
+    "email": "daniel@knippers.eu"
+  },
+  "brandColor": "#E60012",
+  "tags": {
+    "en": [
+      "goodwe",
+      "solar",
+      "inverter",
+      "modbus",
+      "pv"
+    ],
+    "nl": [
+      "goodwe",
+      "zonne-energie",
+      "omvormer",
+      "modbus",
+      "pv"
+    ]
+  },
+  "source": "https://github.com/knippers/eu.knippers.goodwe",
+  "support": "https://github.com/knippers/eu.knippers.goodwe/issues"
+}

@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Status",
+    "nl": "Status"
+  },
+  "uiGroup": "misc",
+  "getable": true,
+  "setable": false,
+  "insights": false
+}
