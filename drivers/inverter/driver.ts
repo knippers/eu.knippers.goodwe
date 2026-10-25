@@ -14,6 +14,8 @@ class InverterDriver extends Homey.Driver {
     session.setHandler(
       "connect",
       async (data: ConnectionSettings): Promise<string> => {
+        // Clear any previous successful check so a failed check cannot reuse it.
+        connection = null;
         const settings = normalizeConnection(data);
         const info = await readDeviceInfo(settings);
         connection = settings;

@@ -102,10 +102,7 @@
       },
       "pair": [
         {
-          "id": "pair",
-          "navigation": {
-            "next": "list_devices"
-          }
+          "id": "pair"
         },
         {
           "id": "list_devices",

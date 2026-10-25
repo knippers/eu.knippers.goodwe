@@ -33,6 +33,13 @@
             <button id="submit" class="homey-button-primary">
               Check connection
             </button>
+            <button
+              id="continue"
+              class="homey-button-primary"
+              style="display: none"
+            >
+              Continue
+            </button>
           </div>
         </div>
       </div>
@@ -45,9 +52,27 @@
       Homey.setTitle("GoodWe");
       Homey.setSubtitle("Connect your GoodWe inverter via Modbus TCP");
 
+      const continueButton = document.getElementById("continue");
+      let verified = false;
+
+      const setVerified = (value) => {
+        verified = value;
+        continueButton.style.display = value ? "" : "none";
+      };
+
+      // Any change to the connection settings invalidates the last check.
+      const resetVerification = () => {
+        setTxt("result", "");
+        setVerified(false);
+      };
+
+      ["ip_address", "port", "modbus_id"].forEach((id) =>
+        document.getElementById(id).addEventListener("input", resetVerification)
+      );
+
       document.getElementById("submit").onclick = (e) => {
         e.preventDefault();
-        setTxt("result", "");
+        resetVerification();
 
         const connection = {
           ip_address: getVal("ip_address").trim(),
@@ -62,8 +87,16 @@
             Homey.alert(err, "error", () => {});
           } else {
             setTxt("result", result);
+            setVerified(true);
           }
         });
+      };
+
+      // Only reachable after a successful check.
+      continueButton.onclick = (e) => {
+        e.preventDefault();
+        if (!verified) return;
+        Homey.showView("list_devices");
       };
     </script>
 
