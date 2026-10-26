@@ -61,7 +61,8 @@
         "measure_voltage",
         "measure_temperature",
         "goodwe_status",
-        "goodwe_firmware"
+        "goodwe_firmware",
+        "goodwe_errormsg"
       ],
       "capabilitiesOptions": {
         "measure_power": {
@@ -180,6 +181,17 @@
     }
   ],
   "capabilities": {
+    "goodwe_errormsg": {
+      "type": "string",
+      "title": {
+        "en": "Error message",
+        "nl": "Foutmelding"
+      },
+      "uiGroup": "misc",
+      "getable": true,
+      "setable": false,
+      "insights": false
+    },
     "goodwe_firmware": {
       "type": "string",
       "title": {

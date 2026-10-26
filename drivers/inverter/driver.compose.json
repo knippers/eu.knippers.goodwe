@@ -11,7 +11,8 @@
     "measure_voltage",
     "measure_temperature",
     "goodwe_status",
-    "goodwe_firmware"
+    "goodwe_firmware",
+    "goodwe_errormsg"
   ],
   "capabilitiesOptions": {
     "measure_power": {

@@ -20,6 +20,7 @@ class InverterDevice extends Homey.Device {
       "measure_temperature",
       "goodwe_status",
       "goodwe_firmware",
+      "goodwe_errormsg",
     ];
 
     for (const capability of capabilities) {
@@ -73,6 +74,21 @@ class InverterDevice extends Homey.Device {
     }
   }
 
+  // The inverter powers off at night, so an unreachable inverter is expected.
+  // Report zero output and store the reason in goodwe_errormsg instead of
+  // marking the device unavailable.
+  private async updateErrorValues(message: string) {
+    for (const capability of [
+      "measure_power",
+      "goodwe_pv1_power",
+      "goodwe_pv2_power",
+      "measure_voltage",
+    ]) {
+      await this.setCapabilityValue(capability, 0).catch(this.error);
+    }
+    await this.setCapabilityValue("goodwe_errormsg", message).catch(this.error);
+  }
+
   private async poll() {
     // Avoid overlapping requests if the inverter responds slowly.
     if (this.polling) return;
@@ -81,12 +97,13 @@ class InverterDevice extends Homey.Device {
     try {
       const data = await readRuntimeData(this.connection);
       await this.updateCapabilityValues(data);
+      await this.setCapabilityValue("goodwe_errormsg", "").catch(this.error);
       await this.setAvailable().catch(this.error);
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
       this.error("Failed to read inverter data", err);
-      await this.setUnavailable(
-        err instanceof Error ? err.message : String(err)
-      ).catch(this.error);
+      await this.updateErrorValues(message);
+      await this.setAvailable().catch(this.error);
     } finally {
       this.polling = false;
     }

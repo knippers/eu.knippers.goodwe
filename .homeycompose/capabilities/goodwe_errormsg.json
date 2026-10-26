@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Error message",
+    "nl": "Foutmelding"
+  },
+  "uiGroup": "misc",
+  "getable": true,
+  "setable": false,
+  "insights": false
+}
