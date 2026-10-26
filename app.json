@@ -156,6 +156,25 @@
               "value": 1
             }
           ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Polling",
+            "nl": "Uitlezen"
+          },
+          "children": [
+            {
+              "id": "poll_interval",
+              "type": "number",
+              "label": {
+                "en": "Polling interval (minutes)",
+                "nl": "Uitleesinterval (minuten)"
+              },
+              "value": 5,
+              "min": 1
+            }
+          ]
         }
       ]
     }

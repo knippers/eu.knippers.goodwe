@@ -12,7 +12,7 @@
           class="homey-form-input"
           id="ip_address"
           type="text"
-          placeholder="192.168.1.50"
+          placeholder="192.168.0.50"
         />
       </div>
 
@@ -22,25 +22,38 @@
       </div>
 
       <div class="homey-form-group">
-        <label class="homey-form-label" for="modbus_id">Modbus ID</label>
+        <label class="homey-form-label" for="modbus_id">Modbus ID (1-247)</label>
         <input class="homey-form-input" id="modbus_id" type="number" value="1" />
+      </div>
+
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="poll_interval"
+          >Polling interval (minutes, minimum 1)</label
+        >
+        <input
+          class="homey-form-input"
+          id="poll_interval"
+          type="number"
+          min="1"
+          value="5"
+        />
       </div>
 
       <div>
         <div class="flex-container">
           <div class="item-left" id="result"></div>
-          <div class="item-right">
-            <button id="submit" class="homey-button-primary">
-              Check connection
-            </button>
-            <button
-              id="continue"
-              class="homey-button-primary"
-              style="display: none"
-            >
-              Continue
-            </button>
-          </div>
+        </div>
+        <div class="button-group">
+          <button id="submit" class="homey-button-primary">
+            Check connection
+          </button>
+          <button
+            id="continue"
+            class="homey-button-primary"
+            style="display: none"
+          >
+            Continue
+          </button>
         </div>
       </div>
     </fieldset>
@@ -60,13 +73,13 @@
         continueButton.style.display = value ? "" : "none";
       };
 
-      // Any change to the connection settings invalidates the last check.
+      // Any change to the settings invalidates the last check.
       const resetVerification = () => {
         setTxt("result", "");
         setVerified(false);
       };
 
-      ["ip_address", "port", "modbus_id"].forEach((id) =>
+      ["ip_address", "port", "modbus_id", "poll_interval"].forEach((id) =>
         document.getElementById(id).addEventListener("input", resetVerification)
       );
 
@@ -78,6 +91,7 @@
           ip_address: getVal("ip_address").trim(),
           port: Number(getVal("port") || 502),
           modbus_id: Number(getVal("modbus_id") || 1),
+          poll_interval: Number(getVal("poll_interval") || 5),
         };
 
         Homey.showLoadingOverlay();
@@ -112,8 +126,12 @@
         flex-grow: 1;
       }
 
-      .item-right {
-        margin-left: 10px;
+      .button-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
       }
     </style>
   </body>

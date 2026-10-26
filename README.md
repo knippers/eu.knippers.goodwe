@@ -87,7 +87,7 @@ The CLI installs the app on the Homey you have selected and keeps it running, st
 4. Press **Check connection**. On success, the app shows the serial number and firmware version.
 5. Press **Continue** and add the device.
 
-The inverter is polled every 30 seconds. You can change the IP address, port, or Modbus ID later in the device settings.
+The inverter is polled every 5 minutes by default. You can change the polling interval (minimum 1 minute), IP address, port, or Modbus ID later in the device settings.
 
 ## Project structure
 

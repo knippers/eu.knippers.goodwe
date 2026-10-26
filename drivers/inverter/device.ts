@@ -2,7 +2,8 @@ import Homey from "homey";
 import { createClient, readDeviceInfo, readRuntimeData } from "../../lib/goodwe";
 import { ConnectionSettings, RuntimeData } from "../../lib/types";
 
-const POLL_INTERVAL_MS = 30000;
+const DEFAULT_POLL_INTERVAL_MINUTES = 5;
+const MIN_POLL_INTERVAL_MINUTES = 1;
 
 class InverterDevice extends Homey.Device {
   private timer: NodeJS.Timeout | null = null;
@@ -35,6 +36,17 @@ class InverterDevice extends Homey.Device {
       port: Number(this.getSetting("port") ?? 502),
       modbus_id: Number(this.getSetting("modbus_id") ?? 1),
     };
+  }
+
+  private get pollIntervalMs(): number {
+    // Devices paired before this setting existed have no value, so use the default.
+    const minutes = Number(
+      this.getSetting("poll_interval") ?? DEFAULT_POLL_INTERVAL_MINUTES
+    );
+    const safeMinutes = Number.isFinite(minutes)
+      ? Math.max(MIN_POLL_INTERVAL_MINUTES, minutes)
+      : DEFAULT_POLL_INTERVAL_MINUTES;
+    return safeMinutes * 60 * 1000;
   }
 
   private async updateCapabilityValues(data: RuntimeData) {
@@ -83,7 +95,7 @@ class InverterDevice extends Homey.Device {
   private startPolling() {
     this.stopPolling();
     this.poll();
-    this.timer = setInterval(() => this.poll(), POLL_INTERVAL_MS);
+    this.timer = setInterval(() => this.poll(), this.pollIntervalMs);
   }
 
   private stopPolling() {
@@ -117,10 +129,10 @@ class InverterDevice extends Homey.Device {
   }): Promise<void> {
     if (
       changedKeys.some((key) =>
-        ["ip_address", "port", "modbus_id"].includes(key)
+        ["ip_address", "port", "modbus_id", "poll_interval"].includes(key)
       )
     ) {
-      this.log("Connection settings changed, restarting polling");
+      this.log("Connection or polling settings changed, restarting polling");
       this.startPolling();
     }
   }

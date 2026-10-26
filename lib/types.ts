@@ -4,6 +4,10 @@ export type ConnectionSettings = {
   modbus_id: number;
 };
 
+export type PairSettings = ConnectionSettings & {
+  poll_interval: number;
+};
+
 export type DeviceInfo = {
   serialNumber: string;
   firmware: string;
