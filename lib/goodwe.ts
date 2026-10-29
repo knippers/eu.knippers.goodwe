@@ -25,6 +25,14 @@ const TOTAL_POWER_OFFSET = (30127 - RUNTIME_START) * 2; // U32
 const WORK_MODE_OFFSET = (30129 - RUNTIME_START) * 2;
 const TEMPERATURE_OFFSET = (30141 - RUNTIME_START) * 2; // S16, 0.1 °C
 
+// Rated AC output register (U16, read as watts). Not verified on the DNS G3
+// family; the value is range-checked and falls back to the datasheet maximum.
+const RATED_POWER_REGISTER = 35001;
+const MIN_RATED_POWER_W = 1500;
+const MAX_RATED_POWER_W = 6000;
+export const DEFAULT_MAX_AC_POWER_W = 5500;
+export const MAX_AC_POWER_STORE_KEY = "max_ac_power";
+
 const WORK_MODES: Record<number, string> = {
   0: "Wait",
   1: "Normal",
@@ -70,6 +78,22 @@ export async function readDeviceInfo(
   }
 
   return { serialNumber, firmware };
+}
+
+export async function readMaxAcPower(
+  connection: ConnectionSettings
+): Promise<number> {
+  const client = createClient(connection);
+  const buffer = await client.readHoldingRegisters(RATED_POWER_REGISTER, 1);
+
+  const ratedPower = buffer.readUInt16BE(0);
+  if (ratedPower < MIN_RATED_POWER_W || ratedPower > MAX_RATED_POWER_W) {
+    throw new Error(
+      `Rated power ${ratedPower} W is outside ${MIN_RATED_POWER_W}-${MAX_RATED_POWER_W} W`
+    );
+  }
+
+  return ratedPower;
 }
 
 export async function readRuntimeData(

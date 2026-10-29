@@ -1,16 +1,23 @@
 import Homey from "homey";
-import { createClient, readDeviceInfo, readRuntimeData } from "../../lib/goodwe";
+import {
+  DEFAULT_MAX_AC_POWER_W,
+  MAX_AC_POWER_STORE_KEY,
+  createClient,
+  readDeviceInfo,
+  readMaxAcPower,
+  readRuntimeData,
+} from "../../lib/goodwe";
 import { ConnectionSettings, RuntimeData } from "../../lib/types";
 
 const DEFAULT_POLL_INTERVAL_MINUTES = 5;
 const MIN_POLL_INTERVAL_MINUTES = 1;
-// Max. AC active power of the GW5000-DNS-30 per the GoodWe DNS G3 datasheet.
-// Readings above this are invalid (e.g. a bad 32-bit register read) and are ignored.
-const MAX_AC_POWER_W = 5500;
 
 class InverterDevice extends Homey.Device {
   private timer: NodeJS.Timeout | null = null;
   private polling = false;
+  // Readings above the inverter's rated AC output are invalid (e.g. a bad
+  // 32-bit register read) and are ignored. Set from the store at init.
+  private maxAcPower = DEFAULT_MAX_AC_POWER_W;
 
   // Homey does not automatically add newly declared capabilities to devices
   // that were paired before the capability existed.
@@ -54,13 +61,13 @@ class InverterDevice extends Homey.Device {
   }
 
   private async updateCapabilityValues(data: RuntimeData) {
-    if (data.totalPower <= MAX_AC_POWER_W) {
+    if (data.totalPower <= this.maxAcPower) {
       await this.setCapabilityValue("measure_power", data.totalPower).catch(
         this.error
       );
     } else {
       this.error(
-        `Ignoring invalid total power reading: ${data.totalPower} W exceeds ${MAX_AC_POWER_W} W`
+        `Ignoring invalid total power reading: ${data.totalPower} W exceeds ${this.maxAcPower} W`
       );
     }
     await this.setCapabilityValue("goodwe_pv1_power", data.pv1Power).catch(
@@ -131,8 +138,27 @@ class InverterDevice extends Homey.Device {
     }
   }
 
+  // Devices paired before the rated power was stored have no value yet.
+  private async loadMaxAcPower() {
+    const stored = this.getStoreValue(MAX_AC_POWER_STORE_KEY);
+    if (typeof stored === "number") {
+      this.maxAcPower = stored;
+      return;
+    }
+
+    // Only store a successful read, so a failure is retried on the next start.
+    try {
+      this.maxAcPower = await readMaxAcPower(this.connection);
+      await this.setStoreValue(MAX_AC_POWER_STORE_KEY, this.maxAcPower);
+    } catch (err) {
+      this.error("Could not read rated power, using default", err);
+      this.maxAcPower = DEFAULT_MAX_AC_POWER_W;
+    }
+  }
+
   async onInit() {
     await this.syncCapabilities();
+    await this.loadMaxAcPower();
 
     // Firmware changes rarely, so it is read once at startup.
     try {

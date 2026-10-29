@@ -1,5 +1,10 @@
 import Homey from "homey";
-import { readDeviceInfo } from "../../lib/goodwe";
+import {
+  DEFAULT_MAX_AC_POWER_W,
+  MAX_AC_POWER_STORE_KEY,
+  readDeviceInfo,
+  readMaxAcPower,
+} from "../../lib/goodwe";
 import { PairSettings } from "../../lib/types";
 
 const DEFAULT_POLL_INTERVAL_MINUTES = 5;
@@ -12,6 +17,7 @@ class InverterDriver extends Homey.Driver {
 
   async onPair(session: Homey.Driver.PairSession): Promise<void> {
     let connection: PairSettings | null = null;
+    let maxAcPower = DEFAULT_MAX_AC_POWER_W;
 
     // Called by the "Check connection" button on the pair page.
     session.setHandler(
@@ -21,6 +27,11 @@ class InverterDriver extends Homey.Driver {
         connection = null;
         const settings = normalizeConnection(data);
         const info = await readDeviceInfo(settings);
+        // A failed rated-power read should not block pairing; use the fallback.
+        maxAcPower = await readMaxAcPower(settings).catch((err: unknown) => {
+          this.log("Could not read rated power, using default", err);
+          return DEFAULT_MAX_AC_POWER_W;
+        });
         connection = settings;
         return `GoodWe ${info.serialNumber} (firmware ${info.firmware}) found!`;
       }
@@ -39,6 +50,7 @@ class InverterDriver extends Homey.Driver {
           name: `GoodWe ${info.serialNumber}`,
           data: { id: info.serialNumber },
           settings: { ...connection },
+          store: { [MAX_AC_POWER_STORE_KEY]: maxAcPower },
         },
       ];
     });
