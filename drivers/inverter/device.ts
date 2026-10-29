@@ -4,6 +4,9 @@ import { ConnectionSettings, RuntimeData } from "../../lib/types";
 
 const DEFAULT_POLL_INTERVAL_MINUTES = 5;
 const MIN_POLL_INTERVAL_MINUTES = 1;
+// Max. AC active power of the GW5000-DNS-30 per the GoodWe DNS G3 datasheet.
+// Readings above this are invalid (e.g. a bad 32-bit register read) and are ignored.
+const MAX_AC_POWER_W = 5500;
 
 class InverterDevice extends Homey.Device {
   private timer: NodeJS.Timeout | null = null;
@@ -51,9 +54,15 @@ class InverterDevice extends Homey.Device {
   }
 
   private async updateCapabilityValues(data: RuntimeData) {
-    await this.setCapabilityValue("measure_power", data.totalPower).catch(
-      this.error
-    );
+    if (data.totalPower <= MAX_AC_POWER_W) {
+      await this.setCapabilityValue("measure_power", data.totalPower).catch(
+        this.error
+      );
+    } else {
+      this.error(
+        `Ignoring invalid total power reading: ${data.totalPower} W exceeds ${MAX_AC_POWER_W} W`
+      );
+    }
     await this.setCapabilityValue("goodwe_pv1_power", data.pv1Power).catch(
       this.error
     );
