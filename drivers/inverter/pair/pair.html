@@ -17,7 +17,15 @@
       </div>
 
       <div class="homey-form-group">
-        <label class="homey-form-label" for="port">TCP port</label>
+        <label class="homey-form-label" for="protocol">Protocol</label>
+        <select class="homey-form-select" id="protocol">
+          <option value="tcp" selected>Modbus TCP</option>
+          <option value="udp">Modbus UDP</option>
+        </select>
+      </div>
+
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="port">Port</label>
         <input class="homey-form-input" id="port" type="number" value="502" />
       </div>
 
@@ -63,7 +71,12 @@
       const setTxt = (id, txt) => (document.getElementById(id).innerHTML = txt);
 
       Homey.setTitle("GoodWe");
-      Homey.setSubtitle("Connect your GoodWe inverter via Modbus TCP");
+      Homey.setSubtitle("Connect your GoodWe inverter via Modbus");
+
+      // Default port per protocol: Modbus TCP uses 502, Modbus UDP uses 8899.
+      const DEFAULT_PORTS = { tcp: 502, udp: 8899 };
+      // Default Modbus ID per protocol: TCP uses 1, UDP uses 127 (0x7F).
+      const DEFAULT_MODBUS_IDS = { tcp: 1, udp: 127 };
 
       const continueButton = document.getElementById("continue");
       let verified = false;
@@ -83,14 +96,24 @@
         document.getElementById(id).addEventListener("input", resetVerification)
       );
 
+      // Switching the protocol moves the port and Modbus ID to that protocol's defaults.
+      document.getElementById("protocol").addEventListener("change", (e) => {
+        document.getElementById("port").value = DEFAULT_PORTS[e.target.value];
+        document.getElementById("modbus_id").value =
+          DEFAULT_MODBUS_IDS[e.target.value];
+        resetVerification();
+      });
+
       document.getElementById("submit").onclick = (e) => {
         e.preventDefault();
         resetVerification();
 
+        const protocol = getVal("protocol");
         const connection = {
           ip_address: getVal("ip_address").trim(),
-          port: Number(getVal("port") || 502),
-          modbus_id: Number(getVal("modbus_id") || 1),
+          protocol,
+          port: Number(getVal("port") || DEFAULT_PORTS[protocol]),
+          modbus_id: Number(getVal("modbus_id") || DEFAULT_MODBUS_IDS[protocol]),
           poll_interval: Number(getVal("poll_interval") || 5),
         };
 

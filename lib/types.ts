@@ -1,8 +1,15 @@
+export type ModbusProtocol = "tcp" | "udp";
+
 export type ConnectionSettings = {
   ip_address: string;
+  protocol: ModbusProtocol;
   port: number;
   modbus_id: number;
 };
+
+export interface ModbusClient {
+  readHoldingRegisters(startAddress: number, count: number): Promise<Buffer>;
+}
 
 export type PairSettings = ConnectionSettings & {
   poll_interval: number;

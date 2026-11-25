@@ -16,11 +16,36 @@
         "value": ""
       },
       {
+        "id": "protocol",
+        "type": "dropdown",
+        "label": {
+          "en": "Protocol",
+          "nl": "Protocol"
+        },
+        "value": "tcp",
+        "values": [
+          {
+            "id": "tcp",
+            "label": {
+              "en": "Modbus TCP",
+              "nl": "Modbus TCP"
+            }
+          },
+          {
+            "id": "udp",
+            "label": {
+              "en": "Modbus UDP",
+              "nl": "Modbus UDP"
+            }
+          }
+        ]
+      },
+      {
         "id": "port",
         "type": "number",
         "label": {
-          "en": "TCP port",
-          "nl": "TCP-poort"
+          "en": "Port",
+          "nl": "Poort"
         },
         "value": 502
       },

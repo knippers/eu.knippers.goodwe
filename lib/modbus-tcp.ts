@@ -1,9 +1,10 @@
 import * as net from "net";
+import { ModbusClient } from "./types";
 
 const FUNC_READ_HOLDING = 0x03;
 const DEFAULT_TIMEOUT_MS = 5000;
 
-export class ModbusTcpClient {
+export class ModbusTcpClient implements ModbusClient {
   private transactionId = 0;
 
   constructor(

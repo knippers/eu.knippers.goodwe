@@ -1,5 +1,12 @@
 import { ModbusTcpClient } from "./modbus-tcp";
-import { ConnectionSettings, DeviceInfo, RuntimeData } from "./types";
+import { ModbusUdpClient } from "./modbus-udp";
+import {
+  ConnectionSettings,
+  DeviceInfo,
+  ModbusClient,
+  ModbusProtocol,
+  RuntimeData,
+} from "./types";
 
 // Register map for the GoodWe DT/MS/D-NS/XS (G3) family, which includes the
 // GW5000-DNS series. Addresses are Modbus holding-register numbers (30001 = 0x7531).
@@ -45,12 +52,31 @@ function readVoltageOrCurrent(buffer: Buffer, offset: number): number {
   return raw === 0xffff ? 0 : raw / 10;
 }
 
-export function createClient(connection: ConnectionSettings): ModbusTcpClient {
-  return new ModbusTcpClient(
-    connection.ip_address,
-    Number(connection.port),
-    Number(connection.modbus_id)
-  );
+// Default port per Modbus transport. Modbus UDP uses port 8899 on GoodWe inverters.
+export const DEFAULT_PORTS: Record<ModbusProtocol, number> = {
+  tcp: 502,
+  udp: 8899,
+};
+
+// Default Modbus ID per transport. Over UDP, the DT/MS/D-NS/XS family answers to 127 (0x7F).
+export const DEFAULT_MODBUS_IDS: Record<ModbusProtocol, number> = {
+  tcp: 1,
+  udp: 127,
+};
+
+// Anything other than "udp" (including settings saved before the protocol existed) is Modbus TCP.
+export function parseProtocol(value: unknown): ModbusProtocol {
+  return value === "udp" ? "udp" : "tcp";
+}
+
+export function createClient(connection: ConnectionSettings): ModbusClient {
+  const port = Number(connection.port);
+  const unitId = Number(connection.modbus_id);
+
+  if (connection.protocol === "udp") {
+    return new ModbusUdpClient(connection.ip_address, port, unitId);
+  }
+  return new ModbusTcpClient(connection.ip_address, port, unitId);
 }
 
 export async function readDeviceInfo(

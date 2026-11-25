@@ -1,8 +1,11 @@
 import Homey from "homey";
 import {
   DEFAULT_MAX_AC_POWER_W,
+  DEFAULT_MODBUS_IDS,
+  DEFAULT_PORTS,
   MAX_AC_POWER_STORE_KEY,
   createClient,
+  parseProtocol,
   readDeviceInfo,
   readMaxAcPower,
   readRuntimeData,
@@ -42,10 +45,15 @@ class InverterDevice extends Homey.Device {
   }
 
   private get connection(): ConnectionSettings {
+    // Devices paired before the protocol setting existed use Modbus TCP.
+    const protocol = parseProtocol(this.getSetting("protocol"));
     return {
       ip_address: String(this.getSetting("ip_address")),
-      port: Number(this.getSetting("port") ?? 502),
-      modbus_id: Number(this.getSetting("modbus_id") ?? 1),
+      protocol,
+      port: Number(this.getSetting("port") ?? DEFAULT_PORTS[protocol]),
+      modbus_id: Number(
+        this.getSetting("modbus_id") ?? DEFAULT_MODBUS_IDS[protocol]
+      ),
     };
   }
 
@@ -174,14 +182,37 @@ class InverterDevice extends Homey.Device {
   }
 
   async onSettings({
+    newSettings,
     changedKeys,
   }: {
     newSettings: { [key: string]: boolean | string | number | undefined | null };
     changedKeys: string[];
   }): Promise<void> {
+    // Switching the protocol moves the port and Modbus ID to that protocol's
+    // defaults, unless they were also changed in the same save.
+    if (changedKeys.includes("protocol")) {
+      const protocol = parseProtocol(newSettings.protocol);
+      const defaults: { [key: string]: number } = {};
+      if (!changedKeys.includes("port")) {
+        defaults.port = DEFAULT_PORTS[protocol];
+      }
+      if (!changedKeys.includes("modbus_id")) {
+        defaults.modbus_id = DEFAULT_MODBUS_IDS[protocol];
+      }
+      if (Object.keys(defaults).length > 0) {
+        await this.setSettings(defaults).catch(this.error);
+      }
+    }
+
     if (
       changedKeys.some((key) =>
-        ["ip_address", "port", "modbus_id", "poll_interval"].includes(key)
+        [
+          "ip_address",
+          "protocol",
+          "port",
+          "modbus_id",
+          "poll_interval",
+        ].includes(key)
       )
     ) {
       this.log("Connection or polling settings changed, restarting polling");

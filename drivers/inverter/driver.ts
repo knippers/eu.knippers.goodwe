@@ -1,7 +1,10 @@
 import Homey from "homey";
 import {
   DEFAULT_MAX_AC_POWER_W,
+  DEFAULT_MODBUS_IDS,
+  DEFAULT_PORTS,
   MAX_AC_POWER_STORE_KEY,
+  parseProtocol,
   readDeviceInfo,
   readMaxAcPower,
 } from "../../lib/goodwe";
@@ -59,15 +62,16 @@ class InverterDriver extends Homey.Driver {
 
 function normalizeConnection(data: PairSettings): PairSettings {
   const ip_address = (data.ip_address ?? "").trim();
-  const port = Number(data.port ?? 502);
-  const modbus_id = Number(data.modbus_id ?? 1);
+  const protocol = parseProtocol(data.protocol);
+  const port = Number(data.port ?? DEFAULT_PORTS[protocol]);
+  const modbus_id = Number(data.modbus_id ?? DEFAULT_MODBUS_IDS[protocol]);
   const poll_interval = Number(
     data.poll_interval ?? DEFAULT_POLL_INTERVAL_MINUTES
   );
 
   if (!ip_address) throw new Error("IP address is required");
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
-    throw new Error("TCP port must be between 1 and 65535");
+    throw new Error("Port must be between 1 and 65535");
   }
   if (!Number.isInteger(modbus_id) || modbus_id < 1 || modbus_id > 247) {
     throw new Error("Modbus ID must be between 1 and 247");
@@ -78,7 +82,7 @@ function normalizeConnection(data: PairSettings): PairSettings {
     );
   }
 
-  return { ip_address, port, modbus_id, poll_interval };
+  return { ip_address, protocol, port, modbus_id, poll_interval };
 }
 
 module.exports = InverterDriver;

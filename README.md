@@ -1,6 +1,6 @@
 # GoodWe for Homey
 
-Monitor your GoodWe solar inverter from Homey via Modbus TCP.
+Monitor your GoodWe solar inverter from Homey via Modbus TCP or Modbus UDP.
 
 The app reads runtime data from the inverter over the local network and exposes it as a device in Homey:
 
@@ -15,14 +15,14 @@ The app only reads from the inverter. It does not write any settings to it.
 
 ## Requirements
 
-- A GoodWe inverter with Modbus TCP enabled. The inverter must be reachable on your local network, for example through its built-in LAN or Wi-Fi communication module. The app defaults to TCP port `502` and Modbus ID `1`.
+- A GoodWe inverter with Modbus TCP or Modbus UDP enabled. The inverter must be reachable on your local network, for example through its built-in LAN or Wi-Fi communication module. The app defaults to Modbus TCP on port `502` and Modbus ID `1`. For Modbus UDP the default port is `8899`.
 - A Homey with firmware `>=5.0.0` on the same local network as the inverter (the app uses the `local` platform and LAN connectivity).
 - [Node.js](https://nodejs.org/) (current LTS recommended) and npm.
 - A Homey developer account, used by the Homey CLI to run the app on your Homey.
 
 ### Tested hardware
 
-This app has **only been tested with the GoodWe GW5000-DNS-30** using the **WiFi/LAN Kit-20** module. The register map in `lib/goodwe.ts` is written for the GoodWe DT/MS/D-NS/XS (G3) family, so other models may work, but they are untested. If you use another model, please report your results via the issue tracker.
+This app has **only been tested with the GoodWe GW5000-DNS-30** using the **WiFi/LAN Kit-20** module. The register map in `lib/goodwe.ts` is written for the GoodWe DT/MS/D-NS/XS (G3) family, so other models may work, but they are untested. Modbus UDP support is added for the GoodWe 2500-XS-11, which is also not yet tested on real hardware. If you use another model, please report your results via the issue tracker.
 
 ## Getting started
 
@@ -83,7 +83,7 @@ The CLI installs the app on the Homey you have selected and keeps it running, st
 
 1. In the Homey app, go to **Devices**, press **+**, and choose **GoodWe**.
 2. Choose **Inverter**.
-3. Enter the inverter's **IP address**. Leave **TCP port** at `502` and **Modbus ID** at `1` unless your setup differs.
+3. Enter the inverter's **IP address**. Choose **Protocol** (Modbus TCP or Modbus UDP). The **Port** and **Modbus ID** follow the protocol: `502` and `1` for TCP, `8899` and `127` (`0x7F`) for UDP. Over Modbus UDP the DT/MS/D-NS/XS family answers to ID `127`, so the ID `1` default does not work there. You can still change the ID in the field.
 4. Press **Check connection**. On success, the app shows the serial number and firmware version.
 5. Press **Continue** and add the device.
 
@@ -96,13 +96,14 @@ The inverter is polled every 5 minutes by default. You can change the polling in
 | `app.ts` | App entry point |
 | `drivers/inverter/` | Driver (pairing) and device (polling) logic |
 | `lib/modbus-tcp.ts` | Minimal Modbus TCP client (function code 0x03) |
+| `lib/modbus-udp.ts` | Minimal Modbus UDP client (Modbus RTU frames with CRC-16, function code 0x03) |
 | `lib/goodwe.ts` | GoodWe register map and data decoding |
 | `.homeycompose/` | Source files for the app manifest and capabilities |
 | `app.json` | Generated from `.homeycompose/`. Edit the files in `.homeycompose/` instead. |
 
 ## Troubleshooting
 
-- **Check connection fails:** Confirm the Homey and the inverter are on the same network, the IP address is correct, and the TCP port and Modbus ID match the inverter's Modbus TCP settings. Check that the inverter accepts Modbus TCP connections on that port, for example with a Modbus client on another machine.
+- **Check connection fails:** Confirm the Homey and the inverter are on the same network, the IP address is correct, and the protocol, port, and Modbus ID match the inverter's Modbus settings. Check that the inverter accepts Modbus TCP connections on that port, for example with a Modbus client on another machine.
 - **Device shows unavailable:** The app marks the device unavailable when a read fails or times out (5 second timeout). The reason is shown on the device.
 
 ## License
