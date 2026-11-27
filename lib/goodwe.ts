@@ -14,7 +14,8 @@ import {
 const DEVICE_INFO_START = 30001;
 const DEVICE_INFO_COUNT = 40;
 const RUNTIME_START = 30103;
-const RUNTIME_COUNT = 40;
+// Covers up to the second word of the total energy register (U32 at 30145-30146).
+const RUNTIME_COUNT = 44;
 
 // Byte offsets inside the response buffers (register address - start) * 2.
 const SERIAL_OFFSET = (30004 - DEVICE_INFO_START) * 2; // 8 registers
@@ -31,6 +32,8 @@ const GRID_VOLTAGE_OFFSET = (30118 - RUNTIME_START) * 2;
 const TOTAL_POWER_OFFSET = (30127 - RUNTIME_START) * 2; // U32
 const WORK_MODE_OFFSET = (30129 - RUNTIME_START) * 2;
 const TEMPERATURE_OFFSET = (30141 - RUNTIME_START) * 2; // S16, 0.1 °C
+const E_DAY_OFFSET = (30144 - RUNTIME_START) * 2; // U16, 0.1 kWh
+const E_TOTAL_OFFSET = (30145 - RUNTIME_START) * 2; // U32, 0.1 kWh
 
 // Rated AC output register (U16, read as watts). Not verified on the DNS G3
 // family; the value is range-checked and falls back to the datasheet maximum.
@@ -148,12 +151,17 @@ export async function readRuntimeData(
 
   const workMode = buffer.readUInt16BE(WORK_MODE_OFFSET);
 
+  const rawDailyEnergy = buffer.readUInt16BE(E_DAY_OFFSET);
+  const rawTotalEnergy = buffer.readUInt32BE(E_TOTAL_OFFSET);
+
   return {
     totalPower: buffer.readUInt32BE(TOTAL_POWER_OFFSET),
     pv1Power,
     pv2Power,
     gridVoltage: readVoltageOrCurrent(buffer, GRID_VOLTAGE_OFFSET),
     temperature,
+    dailyEnergy: rawDailyEnergy === 0xffff ? 0 : rawDailyEnergy / 10,
+    totalEnergy: rawTotalEnergy === 0xffffffff ? null : rawTotalEnergy / 10,
     status: WORK_MODES[workMode] ?? `Unknown (${workMode})`,
   };
 }

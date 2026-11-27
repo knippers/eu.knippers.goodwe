@@ -1,0 +1,15 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Energy today",
+    "nl": "Energie vandaag"
+  },
+  "uiGroup": "power",
+  "getable": true,
+  "setable": false,
+  "units": {
+    "en": "kWh"
+  },
+  "decimals": 1,
+  "insights": true
+}

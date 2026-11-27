@@ -12,7 +12,9 @@
     "measure_temperature",
     "goodwe_status",
     "goodwe_firmware",
-    "goodwe_errormsg"
+    "goodwe_errormsg",
+    "meter_power",
+    "goodwe_energy_today"
   ],
   "capabilitiesOptions": {
     "measure_power": {

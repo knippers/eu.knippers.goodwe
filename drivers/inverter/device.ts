@@ -34,6 +34,8 @@ class InverterDevice extends Homey.Device {
       "goodwe_status",
       "goodwe_firmware",
       "goodwe_errormsg",
+      "meter_power",
+      "goodwe_energy_today",
     ];
 
     for (const capability of capabilities) {
@@ -96,6 +98,16 @@ class InverterDevice extends Homey.Device {
         data.temperature
       ).catch(this.error);
     }
+    // meter_power must be cumulative for Homey Energy; the daily value is shown separately.
+    if (data.totalEnergy !== null) {
+      await this.setCapabilityValue("meter_power", data.totalEnergy).catch(
+        this.error
+      );
+    }
+    await this.setCapabilityValue(
+      "goodwe_energy_today",
+      data.dailyEnergy
+    ).catch(this.error);
   }
 
   // The inverter powers off at night, so an unreachable inverter is expected.

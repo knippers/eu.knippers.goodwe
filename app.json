@@ -62,7 +62,9 @@
         "measure_temperature",
         "goodwe_status",
         "goodwe_firmware",
-        "goodwe_errormsg"
+        "goodwe_errormsg",
+        "meter_power",
+        "goodwe_energy_today"
       ],
       "capabilitiesOptions": {
         "measure_power": {
@@ -206,6 +208,21 @@
     }
   ],
   "capabilities": {
+    "goodwe_energy_today": {
+      "type": "number",
+      "title": {
+        "en": "Energy today",
+        "nl": "Energie vandaag"
+      },
+      "uiGroup": "power",
+      "getable": true,
+      "setable": false,
+      "units": {
+        "en": "kWh"
+      },
+      "decimals": 1,
+      "insights": true
+    },
     "goodwe_errormsg": {
       "type": "string",
       "title": {

@@ -26,5 +26,7 @@ export type RuntimeData = {
   pv2Power: number;
   gridVoltage: number;
   temperature: number | null;
+  dailyEnergy: number;
+  totalEnergy: number | null;
   status: string;
 };
